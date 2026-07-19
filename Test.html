@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Viewport optimized for Kindle Paperwhite dimensions -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kindle Weather E-Ink</title>
+    <style>
+        /* --- Reset & Basic Layout --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            /* Use the full viewport size */
+            background-color: white;
+            color: black;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            /* Crucial: High contrast, no smoothing */
+            image-rendering: optimizeSpeed; 
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            -ms-interpolation-mode: nearest-neighbor;
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            height: 100%;
+            padding: 40px; /* Generous padding around content */
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            border-bottom: 4px solid black;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* --- Clock & Date --- */
+        .clock {
+            font-size: 120px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .date {
+            font-size: 32px;
+            margin-top: 10px;
+            font-weight: 700;
+        }
+
+        /* --- Weather Info --- */
+        .weather-details {
+            text-align: right;
+        }
+
+        .temp {
+            font-size: 120px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .conditions {
+            font-size: 36px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* --- Animation Container (The Rain Area) --- */
+        .animation-container {
+            grid-column: 1 / -1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            /* Background elements for context */
+            background-image: 
+                radial-gradient(black 1px, transparent 1px),
+                radial-gradient(black 1px, transparent 1px);
+            background-position: 0 0, 200px 200px;
+            background-size: 400px 400px;
+            border: 2px solid black;
+        }
+
+        /* --- The E-Ink Optimized Rain Animation --- */
+        
+        /* 1. Define the Drop */
+        .raindrop {
+            position: absolute;
+            width: 3px;       /* Thicker line for E-Ink clarity */
+            height: 25px;     /* Long streak */
+            background-color: black;
+            top: -30px;       /* Start above container */
+            opacity: 0.8;
+            
+            /* 2. Define the Animation */
+            /* We use 'steps(20)' to force discrete jumps. 
+               This eliminates smooth browser interpolation which causes ghosting. 
+               The duration (3s) determines how fast it falls. */
+            animation: fall linear infinite;
+            
+            /* Randomize horizontal position */
+            left: calc(10% * var(--r)); 
+            
+            /* Randomize timing delay for chaotic look */
+            animation-delay: calc(-0.5s * var(--r)); 
+            
+            /* Randomize fall duration slightly */
+            animation-duration: calc(2.5s + (0.1s * var(--r)));
+        }
+
+        @keyframes fall {
+            0% { 
+                transform: translateY(0); 
+                opacity: 1;
+            }
+            100% { 
+                /* Move completely off screen */
+                transform: translateY(calc(100vh + 50px)); 
+                opacity: 0; /* Disappear at bottom */
+            }
+        }
+        
+        /* 3. Generate variations using nth-child so they don't look uniform */
+        /* We create 25 unique variations based on prime numbers to avoid patterns */
+        .raindrop:nth-child(1n) { --r: 1; left: 5%; animation-duration: 2.8s; }
+        .raindrop:nth-child(2n) { --r: 2; left: 15%; animation-duration: 3.2s; }
+        .raindrop:nth-child(3n) { --r: 3; left: 25%; animation-duration: 2.9s; }
+        .raindrop:nth-child(5n) { --r: 5; left: 35%; animation-duration: 3.5s; }
+        .raindrop:nth-child(7n) { --r: 7; left: 45%; animation-duration: 3.1s; }
+        .raindrop:nth-child(11n) { --r: 11; left: 55%; animation-duration: 3.3s; }
+        .raindrop:nth-child(13n) { --r: 13; left: 65%; animation-duration: 2.7s; }
+        .raindrop:nth-child(17n) { --r: 17; left: 75%; animation-duration: 3.0s; }
+        .raindrop:nth-child(19n) { --r: 19; left: 85%; animation-duration: 3.4s; }
+        .raindrop:nth-child(23n) { --r: 23; left: 95%; animation-duration: 3.6s; }
+        
+        /* Add a few random cloud shapes in the background of the animation area */
+        .cloud-bg {
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.2; /* Very faint */
+            top: 50px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <div class="header">
+            <div class="clock-group">
+                <div class="clock" id="clock">10:09</div>
+                <div class="date" id="date">Tuesday, October 26</div>
+            </div>
+            <div class="weather-details">
+                <div class="temp" id="temp">12°</div>
+                <div class="conditions" id="conditions">Heavy Rain</div>
+            </div>
+        </div>
+
+        <div class="animation-container">
+            <div class="cloud-bg" style="left: 100px;">☁️</div>
+            <div class="cloud-bg" style="right: 150px; top: 200px;">☁️</div>
+            
+            <!-- The Raindrops -->
+            <!-- We use fewer drops to improve performance on the Kindle browser -->
+            <div class="raindrop" style="--r:1;"></div>
+            <div class="raindrop" style="--r:3;"></div>
+            <div class="raindrop" style="--r:7;"></div>
+            <div class="raindrop" style="--r:11;"></div>
+            <div class="raindrop" style="--r:13;"></div>
+            <div class="raindrop" style="--r:17;"></div>
+            <div class="raindrop" style="--r:19;"></div>
+            <div class="raindrop" style="--r:23;"></div>
+            <div class="raindrop" style="--r:2;"></div>
+            <div class="raindrop" style="--r:4;"></div>
+            <div class="raindrop" style="--r:8;"></div>
+            <div class="raindrop" style="--r:12;"></div>
+            <div class="raindrop" style="--r:14;"></div>
+            <div class="raindrop" style="--r:18;"></div>
+            <div class="raindrop" style="--r:20;"></div>
+            <div class="raindrop" style="--r:24;"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Simple Clock/Date Script ---
+        // Updates once per minute. Note: JavaScript execution 
+        // is paused when the Kindle is asleep.
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Time
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            document.getElementById('clock').innerText = `${hours}:${minutes}`;
+
+            // Date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').innerText = now.toLocaleDateString(undefined, options);
+            
+            // NOTE: Weather data is hardcoded here for the test file.
+            // In a real scenario, you would fetch this from an API (e.g., OpenWeatherMap)
+            // via a backend server (like Raspberry Pi) and inject it.
+        }
+
+        // Initial call and set interval
+        updateDateTime();
+        setInterval(updateDateTime, 60000); // Update every minute
+        
+        // Hack to keep browser awake (experimental)
+        // Entering ~ds in the search bar is more reliable, 
+        // but this attempts to prevent sleep via wake lock if supported.
+        if ('wakeLock' in navigator) {
+            navigator.wakeLock.request('screen');
+        }
+    </script>
+</body>
+</html>
+
