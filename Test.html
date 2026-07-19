@@ -98,29 +98,27 @@
         /* --- The E-Ink Optimized Rain Animation --- */
         
         /* 1. Define the Drop */
-        .raindrop {
-            position: absolute;
-            width: 3px;       /* Thicker line for E-Ink clarity */
-            height: 25px;     /* Long streak */
-            background-color: black;
-            top: -30px;       /* Start above container */
-            opacity: 0.8;
-            
-            /* 2. Define the Animation */
-            /* We use 'steps(20)' to force discrete jumps. 
-               This eliminates smooth browser interpolation which causes ghosting. 
-               The duration (3s) determines how fast it falls. */
-            animation: fall linear infinite;
-            
-            /* Randomize horizontal position */
-            left: calc(10% * var(--r)); 
-            
-            /* Randomize timing delay for chaotic look */
-            animation-delay: calc(-0.5s * var(--r)); 
-            
-            /* Randomize fall duration slightly */
-            animation-duration: calc(2.5s + (0.1s * var(--r)));
-        }
+    /* 1. Define the Sprite Container */
+    .rain-animation {
+        width: 100px; /* Width of ONE frame in your sprite sheet */
+        height: 100px; /* Height of the frame */
+        background-image: url('rain-sprites.png');
+        background-repeat: no-repeat;
+        
+        /* 2. Use 'steps()' to create the frame-by-frame jump */
+        /* If your sprite has 8 frames, use steps(8) */
+        animation: rain-cycle 1s steps(8) infinite;
+    }
+
+    @keyframes rain-cycle {
+        from { background-position: 0px 0px; }
+        /* Shift the background to the end of the sprite sheet */
+        to { background-position: -800px 0px; } 
+    }
+
+<!-- In your body -->
+<div class="rain-animation"></div>
+
 
         @keyframes fall {
             0% { 
