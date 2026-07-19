@@ -1,87 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>E-Ink APNG Dashboard</title>
-    <style>
-        body, html {
-            margin: 0; padding: 0;
-            width: 100vw; height: 100vh;
-            background: #FFF; color: #000;
-            font-family: sans-serif;
-            overflow: hidden;
-        }
-
-        .container {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            height: 100vh;
-            padding: 40px;
-        }
-
-        .header { display: flex; justify-content: space-between; align-items: center; }
-        .clock { font-size: 140px; font-weight: 900; }
+<html>
+    <head>
         
-        .viewport {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 4px solid #000;
-            margin: 30px 0;
-            /* Force the browser to treat this area as a high-contrast zone */
-            background-color: white;
-        }
-
-        /* 
-           Crucial: We disable hardware acceleration on the image
-           to prevent the browser from trying to "smooth" the APNG frames.
-        */
-        #rain-apng {
-            width: 300px;
-            image-rendering: pixelated;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <div class="header">
-            <div class="clock" id="clock">00:00</div>
-        </div>
-
+    </head>
+    <body>
         <div class="viewport">
-            <!-- We use an ID to control the image via JS -->
-            <img id="rain-apng" src="your-animation.png" alt="Rain Animation">
-        </div>
+    <!-- Load the APNG but hide the animation -->
+    <img id="rain-img" src="your-animation.png" style="width: 200px; height: 200px;">
+</div>
 
-        <div id="status" style="font-size: 24px; text-align: center;">Display Active</div>
-    </div>
+<script>
+    // This trick stops the animation from being "live" 
+    // by cloning the image and re-inserting it, or by 
+    // replacing the source with a static frame.
+    
+    // Better yet: Use a 'poster' image (a static .png) 
+    // and only swap in the .apng when you perform a full-screen refresh.
+</script>
 
-    <script>
-        // 1. Clock Logic
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('clock').innerText = 
-                `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-        }
-        setInterval(updateTime, 60000);
-        updateTime();
-
-        // 2. APNG Ghosting Mitigation
-        // Instead of letting the APNG loop infinitely (which triggers ghosting),
-        // we can force the image to 'restart' periodically to clear the E-Ink buffer.
-        const img = document.getElementById('rain-apng');
-        
-        function refreshImage() {
-            // Force browser to re-render the image to 'clear' the ghosting buildup
-            const src = img.src;
-            img.src = '';
-            img.src = src;
-        }
-
-        // Force a clear/refresh every 10 seconds to stop the 'smear'
-        setInterval(refreshImage, 10000);
-    </script>
-</body>
+    </body>
 </html>
