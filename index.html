@@ -5,7 +5,16 @@
   <body>
     <img src="images/weather/rain_overlay.png">
     <style>
-      body {transform: rotate(90deg)}
+      body {
+        /* Set the rotation angle (e.g., 90deg, 180deg, -45deg) */
+        transform: rotate(90deg);
+      
+        /* Set the point around which the body rotates (default is center) */
+        transform-origin: center center;
+      
+        /* Ensures child elements don't get cut off on rotate */
+        overflow: visible; 
+      }
     </style>
   </body>
 </html>
